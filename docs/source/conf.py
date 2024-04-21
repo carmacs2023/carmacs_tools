@@ -20,8 +20,10 @@ author = 'carmacs'
 master_doc = 'index'
 
 # Add the project root directory to the Python path
-# sys.path.insert(0, os.path.abspath('.'))              # os.path.abspath('.'):  refers to root folder where it specs all files to be located.
-sys.path.insert(0, os.path.abspath('../../'))   # os.path.abspath('../../'):  moves the path 2 dirs up from docs/source to the project root.
+# sys.path.insert(0, os.path.abspath('.'))                  # os.path.abspath('.'):  refers to root folder where it specs all files to be located.
+# sys.path.insert(0, os.path.abspath('../../'))       # os.path.abspath('../../'):  moves the path 2 dirs up from docs/source to the root.
+sys.path.insert(0, os.path.abspath('../../src'))    # Adjust the path to include the 'src' directory where your module is located
+
 
 extensions = [
     'sphinx.ext.autodoc'

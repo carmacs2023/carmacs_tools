@@ -32,9 +32,9 @@ def create_logger(filename: str, name: str, level=10, log_format='%(asctime)s %(
 
     :param filename: The filename for the log file. The logger will use this name with a ".log" extension.
     :param name: The name of the logger. This can be __name__ to use the module's name.
-    :param level: The logging level to capture. Default is logging.DEBUG (10).
-                  Other levels include logging.INFO (20), logging.WARNING (30),
-                  logging.ERROR (40), and logging.CRITICAL (50).
+    :param level: The logging level to capture. Default is logging. DEBUG (10).
+                  Other levels include logging.INFO (20), logging. WARNING (30),
+                  logging. ERROR (40), and logging. CRITICAL (50).
     :param log_format: The format for log messages. Default format includes timestamp, logger name,
                        log level, and the log message.
 
@@ -102,19 +102,6 @@ logger.info(f'Set Locale     : {locale.setlocale(locale.LC_ALL, ("en_US", "UTF-8
 
 class RateLimiter:
 
-    # def __init__(self, max_requests: int, interval_seconds: int):
-    #     """
-    #     Initializes a RateLimiter object with a maximum number of requests allowed over a specified interval in seconds.
-    #
-    #     :param max_requests: The maximum number of requests allowed.
-    #     :type max_requests: int
-    #     :param interval_seconds: The time interval in seconds over which the maximum number of requests is calculated.
-    #     :type interval_seconds: int
-    #     """
-    #     self.max_requests = max_requests
-    #     self.interval_seconds = interval_seconds
-    #     self.timestamps: List[float] = []
-
     def __init__(self, max_requests: int, interval_seconds: int):
         """
         Initializes a RateLimiter object with a maximum number of requests allowed over a specified interval in seconds.
@@ -125,26 +112,6 @@ class RateLimiter:
         self.max_requests = max_requests
         self.interval_seconds = interval_seconds
         self.timestamps: Deque[float] = deque()
-
-    # def wait_for_request_slot(self):
-    #     """
-    #     Waits for an available request slot based on the rate limit configuration.
-    #     This method blocks execution until a request slot is available.
-    #     """
-    #     current_time = time.time()
-    #     # Clear out timestamps outside the current interval
-    #     while self.timestamps and current_time - self.timestamps[0] > self.interval_seconds:
-    #         self.timestamps.pop(0)
-    #
-    #     # If max requests in the interval have not been reached, allow the request
-    #     if len(self.timestamps) < self.max_requests:
-    #         self.timestamps.append(current_time)
-    #     else:
-    #         # Calculate time to wait until the oldest timestamp falls out of the interval
-    #         time_to_wait = self.interval_seconds - (current_time - self.timestamps[0])
-    #         time.sleep(time_to_wait)
-    #         # Recursively check for an available slot
-    #         self.wait_for_request_slot()
 
     def wait_for_request_slot(self):
         """
