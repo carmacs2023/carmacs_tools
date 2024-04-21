@@ -10,7 +10,7 @@ Welcome to carmacs_tools' documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   carmacs_tools
+   carmac_tools
 
 Indices and tables
 ==================

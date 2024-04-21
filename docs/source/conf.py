@@ -19,7 +19,9 @@ author = 'carmacs'
 # Add this line to define the master document for LaTex only
 master_doc = 'index'
 
-sys.path.insert(0, os.path.abspath('.'))
+# Add the project root directory to the Python path
+# sys.path.insert(0, os.path.abspath('.'))              # os.path.abspath('.'):  refers to root folder where it specs all files to be located.
+sys.path.insert(0, os.path.abspath('../../'))   # os.path.abspath('../../'):  moves the path 2 dirs up from docs/source to the project root.
 
 extensions = [
     'sphinx.ext.autodoc'
