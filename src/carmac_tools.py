@@ -8,8 +8,14 @@ import shutil
 import json
 import requests
 from collections import deque
-from typing import Deque
-# ---------------------------------------------- LOGGING ------------------------------------------------------- #
+from typing import Deque, Optional
+import zipfile
+import csv
+import re
+from difflib import SequenceMatcher
+from rapidfuzz import fuzz, process
+
+# region logger methods
 
 # Creating a logging object
 logger = logging.getLogger(__name__)
@@ -90,14 +96,17 @@ def create_logger(filename: str, name: str, level=10, log_format='%(asctime)s %(
 
     return new_logger
 
-# ----------------------------------------------- LOCALE ------------------------------------------------------------------------------------------- #
+# endregion
+
+# region locale
 
 
 logger.debug(f'Current Locale : {locale.getlocale()}')  # get current locale
 logger.info(f'Set Locale     : {locale.setlocale(locale.LC_ALL, ("en_US", "UTF-8"))}')  # set locale
 
+# endregion
 
-# ----------------------------------------------- RATE LIMITER CLASS ------------------------------------------------------------------------------- #
+# region rate limiter class
 
 
 class RateLimiter:
@@ -133,7 +142,9 @@ class RateLimiter:
 
         self.timestamps.append(current_time)
 
-# ----------------------------------------------- DATAFRAME METHODS -------------------------------------------------------------------------------- #
+# endregion
+
+# region dataframes methods
 
 
 def write_dataframe_to_file(df: pd.DataFrame, filepath: str, **kwargs):
@@ -357,8 +368,9 @@ def df_search_column_by_string(df: pd.DataFrame, col_name: str, substring_filter
         logger.error(f'dataframe column {col_name} is not of string type')
         return pd.DataFrame()
 
+# endregion
 
-# ----------------------------------------------- REQUEST METHODS ---------------------------------------------------------------------------------- #
+# region response methods
 
 
 def save_response_to_file(response: requests.models.Response, filepath, **kwargs):
@@ -475,3 +487,150 @@ def load_response_from_file(filepath):
 
     logger.info(f'Finish reading response from file {filepath}\n')
     return data
+
+# endregion
+
+# region retrograming tools
+
+
+def unzip(source: str, destination: str, separate_dirs: bool = True):
+    """
+    Unzips all ZIP files located in the `source` folder to the 'destination' folder.
+    use `separate_dirs`to extract each ZIP to a separate subfolder under `destination`, named after the ZIP file.
+
+    :param source:          string specifying the source path to the folder containing ZIP files.
+    :param destination:     string specifying the destination path where the contents should be extracted.
+    :param separate_dirs:   True to extract ZIPs into separate subdirectories, False to extract directly to destination directory.
+    """
+    try:
+        # Ensure the source directory exists
+        if not os.path.exists(source):
+            print(f"The source directory {source} does not exist.")
+            return
+
+        # Ensure the destination directory exists
+        os.makedirs(destination, exist_ok=True)
+
+        # List all files in the source directory
+        for filename in os.listdir(source):
+            file_path = os.path.join(source, filename)
+            # Check if the file is a ZIP file
+            if zipfile.is_zipfile(file_path):
+                if separate_dirs:
+                    # Path for the subdirectory
+                    subfolder_path = os.path.join(destination, os.path.splitext(filename)[0])
+                    # Create a subdirectory named after the ZIP file (without extension)
+                    os.makedirs(subfolder_path, exist_ok=True)
+                    extract_path = subfolder_path
+                else:
+                    extract_path = destination
+
+                # Open and extract the ZIP file into the specified path
+                with zipfile.ZipFile(file_path, 'r') as zip_ref:
+                    zip_ref.extractall(extract_path)
+                print(f"Extracted '{filename}' ----> {extract_path}")
+            else:
+                print(f"Skipped '{filename}', not a ZIP file.")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+def list_files_to_csv(source: str, filename: str = 'file_list.csv', recursive: bool = False) -> None:
+    """
+    Lists files in the given source folder and writes them to a CSV file.
+    use 'recursive', to list all files recursively with their full paths relative to source folder.
+
+    :param source:      string specifying the source path to the folder containing files to be listed.
+    :param filename:    file path where the filenames will be stored in CSV format.
+    :param recursive:   enables recursion to list files located inside sub-folders.
+    """
+    file_paths = []
+
+    if recursive:
+        # Recursive listing with full relative paths
+        for root, _, files in os.walk(source):
+            for file in files:
+                file_path = os.path.relpath(os.path.join(root, file), start=source)
+                file_paths.append(file_path)
+    else:
+        # Non-recursive listing, only files in the direct input_folder
+        for file in os.listdir(source):
+            file_path = os.path.join(source, file)
+            if os.path.isfile(file_path):
+                file_paths.append(file)
+
+    # Write file paths to a CSV file
+    with open(filename, 'w', newline='', encoding='utf-8') as file:
+        # writer = csv.writer(file)
+        writer = csv.writer(file, quoting=csv.QUOTE_ALL)
+        for path in file_paths:
+            writer.writerow([path])
+
+    print(f"CSV file '{filename}' has been created with file names from '{source}'.")
+
+
+def find_matches_rapidfuzz(game_list, filename_list, match_method='exact', similarity_threshold=80):
+    """
+    Compare a list of game names with a list of filenames to find matches based on the specified matching method.
+
+    :param game_list: List of game names.
+    :param filename_list: List of filenames.
+    :param match_method: 'exact' for direct substring checks, 'partial' for fuzzy matching with a similarity threshold.
+    :param similarity_threshold: The minimum similarity percentage required for a match (used in 'partial' matching).
+    :return: List of dictionaries with game names and matched filenames or None.
+    """
+
+    def normalize_string(s: str) -> str:
+        """Normalize strings by converting to lower case and removing non-alphanumeric characters."""
+        return re.sub(r'[^a-z0-9]', '', s.lower())
+
+    results = []
+
+    for game in game_list:
+        normalized_game = normalize_string(game)
+        best_match = None
+        highest_score = 0
+
+        for filename in filename_list:
+            normalized_filename = normalize_string(filename)
+            score = 0
+
+            if match_method == 'exact':
+                # Using ratio for exact matching
+                score = fuzz.ratio(normalized_game, normalized_filename)
+
+            elif match_method == 'partial':
+                # Using partial_ratio for partial matching
+                score = fuzz.partial_ratio(normalized_game, normalized_filename)
+
+            # Update if this score is the best found and meets the threshold
+            if score >= similarity_threshold and score > highest_score:
+                highest_score = score
+                best_match = filename
+
+        results.append({'name': game, 'filename': best_match})
+
+    return results
+
+
+def load_filenames_from_csv(filename: str) -> list:
+    """
+    Load filenames from a CSV file into a list of strings.
+
+    :param filename: Path to the CSV file containing the filenames.
+    :return: List of filenames as strings.
+    """
+    filenames = []
+    with open(filename, 'r', encoding='utf-8') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            # Each row is a list of fields; in this case, each row has a single field which is the filename.
+            if row:  # This checks if the row is not empty.
+                # # Remove surrounding quotes if they exist and strip whitespace
+                filename_cleaned = re.sub(r'^["\']+|["\']+$', '', row[0].strip())
+                filenames.append(filename_cleaned)
+
+    return filenames
+
+# endregion
