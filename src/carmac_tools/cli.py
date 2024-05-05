@@ -56,8 +56,6 @@ def main():
     rapidfuzz_parser.add_argument('--sort', action='store_true', help='Sort the results alphabetically by name.')
     rapidfuzz_parser.add_argument('--verbose', action='store_true', help='Print verbose output during the process.')
     rapidfuzz_parser.add_argument('--output_to_file', action='store_true', help='Output the best matches to a text file.')
-    rapidfuzz_parser.add_argument('--output_filename', type=str, default='output.txt',
-                                  help='Filename for the output text file containing best matches.')
 
     # Subparser for the copy_matched_files command
     copy_parser = subparsers.add_parser('copy_files_from_list', help='Copy matched files from source to destination.')

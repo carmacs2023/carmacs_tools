@@ -1,0 +1,6 @@
+argcomplete~=3.3.0
+pandas~=2.0.0
+requests~=2.31.0
+rapidfuzz~=3.8.1
+setuptools~=65.5.1
+thefuzz~=0.22.1
