@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='carmacs_tools',
+    name='carmac_tools',
     version='0.1',
     url='https://github.com/carmacs2023/carmacs_tools',
     license='MIT',
@@ -14,7 +14,7 @@ setup(
     package_dir={"": "src"},  # Tells setuptools that package sources are under src
     install_requires=[      # Specify package outside standard libraries included in Python
         'pandas>=1.0',      # Specify versions if needed, means version 1 or higher
-        'requests>=2.0'     # Specify versions if needed, means version 2 or higher
+        'requests>=2.0',     # Specify versions if needed, means version 2 or higher
         'rapidfuzz>=3.8'
     ],
     classifiers=[
@@ -27,9 +27,10 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11'
     ],
+    python_requires='>=3.10',
     entry_points={
         'console_scripts': [
-            'ct=cli:main'
+            'ct=carmac_tools.cli:main'
         ]
     },
 )

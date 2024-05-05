@@ -4,13 +4,15 @@
    contain the root `toctree` directive.
 
 Welcome to carmacs_tools' documentation!
-=======================================
+========================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   carmac_tools
+   file_tools
+   df_tools
+   helper
 
 Indices and tables
 ==================

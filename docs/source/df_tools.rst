@@ -1,7 +1,7 @@
-carmac_tools Documentation
+df_tools Documentation
 ===========================
 
-.. automodule:: carmac_tools
+.. automodule:: carmac_tools.df_tools
    :members:
    :undoc-members:
    :show-inheritance:

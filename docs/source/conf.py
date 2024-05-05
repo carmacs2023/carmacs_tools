@@ -9,7 +9,7 @@ import sys
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'edgar-wrapper-py'
+project = 'carmac_tools'
 copyright = '2023, carmacs'
 author = 'carmacs'
 
@@ -22,7 +22,7 @@ master_doc = 'index'
 # Add the project root directory to the Python path
 # sys.path.insert(0, os.path.abspath('.'))                  # os.path.abspath('.'):  refers to root folder where it specs all files to be located.
 # sys.path.insert(0, os.path.abspath('../../'))       # os.path.abspath('../../'):  moves the path 2 dirs up from docs/source to the root.
-sys.path.insert(0, os.path.abspath('../../src'))    # Adjust the path to include the 'src' directory where your module is located
+sys.path.insert(0, os.path.abspath('../../src/carmac_tools'))    # Adjust the path to include the 'src' directory where your module is located
 
 
 extensions = [
@@ -62,16 +62,16 @@ html_theme_options = {
 # LaTeX preamble to adjust the PDF's appearance.
 # change the font size, paper size...etc, it assumes LaTeX for MacOs installed
 
-latex_elements = {
-    'papersize': 'letterpaper',
-    'pointsize': '10pt',
-    'preamble': r'''
-    \usepackage{times}
-    ''',
-}
+# latex_elements = {
+#     'papersize': 'letterpaper',
+#     'pointsize': '10pt',
+#     'preamble': r'''
+#     \usepackage{times}
+#     ''',
+# }
 
 # LaTeX Document Class to specify a different document class such as howto or manual to change the layout:
-latex_documents = [
-  (master_doc, 'edgar-wrapper-py.tex', 'edgar-wrapper-py Documentation',
-   'carmacs', 'manual'),
-]
+# latex_documents = [
+#   (master_doc, 'edgar-wrapper-py.tex', 'edgar-wrapper-py Documentation',
+#    'carmacs', 'manual'),
+# ]
