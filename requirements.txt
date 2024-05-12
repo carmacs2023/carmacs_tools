@@ -4,3 +4,6 @@ requests~=2.31.0
 rapidfuzz~=3.8.1
 setuptools~=65.5.1
 thefuzz~=0.22.1
+lxml~=4.9.2
+pytest~=8.2.0
+python-dotenv~=1.0.1

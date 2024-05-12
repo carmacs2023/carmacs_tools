@@ -9,6 +9,7 @@ import os
 from typing import Optional, List, Dict, Tuple
 import subprocess
 
+# Any logging activities inside functions should use this global logger.
 from .config import get_global_logger
 logger = get_global_logger()
 
@@ -59,7 +60,7 @@ def unzip(source: str, destination: str, separate_dirs: bool = True) -> None:
         print(f"An error occurred: {e}")
 
 
-def list_files_from_dir(source: str, filename: str = 'file_list', output: str = 'txt', recursive: bool = False) -> None:
+def list_files_from_dir(source: str, filename: str = 'file_list', output: str = 'txt', recursive: bool = False) -> Optional[List[str]]:
     """
     Lists files in the specified source directory and writes the list to a file in either text or CSV format.
     Allows for both non-recursive and recursive listing of files.
@@ -103,14 +104,14 @@ def list_files_from_dir(source: str, filename: str = 'file_list', output: str = 
             # Write file paths to a plain text file
             with open(filename, 'w', encoding='utf-8') as file:
                 file.writelines(f"{path}\n" for path in file_paths)
-                # for path in file_paths:
-                #     file.write(path + '\n')
+            return file_paths
+
         elif output == 'csv':
             # Write file paths to a CSV file using a safer delimiter
             with open(filename, 'w', newline='', encoding='utf-8') as file:
                 csv.writer(file, delimiter='|', quoting=csv.QUOTE_MINIMAL).writerows([path] for path in file_paths)
-                # for path in file_paths:
-                #     writer.writerow([path])
+            return file_paths
+
     except IOError as e:
         logger.error(f"Failed to write files to {filename}: {e}")
         raise
@@ -220,13 +221,11 @@ def string_matching(base_list: List[str], target_list: List[str],
                 if not is_valid_filename(filename=target_name, os_type="windows"):
                     logger.debug(f"Warning: Filename invalid, contains illegal characters: {target_name}")
                     continue
-                # target_name = remove_extension(filename=target_name)
                 # logger.debug(f'Target name without extension: {remove_extension(filename=target_name)}')
                 normalized_target = normalize_string(s=remove_extension(filename=target_name), filter_pattern=normalization_pattern)
             else:
                 normalized_target = normalize_string(s=target_name, filter_pattern=normalization_pattern)
 
-            # normalized_target = normalize_string(s=target_name, filter_pattern=normalization_pattern)
             score = get_score(library=library, match_method=match_method, normalized_name=normalized_name, normalized_target=normalized_target)
             # logger.debug(f'Target name: {target_name} - Normalized: {normalized_target} - score: {score}')
 
@@ -367,9 +366,10 @@ def match_names_to_filenames(name_list_file: str, filename_list_file: str, libra
                 for result in matched_results:
                     file.write(f"{result['matched_name']}\n")
 
-            with open("output_unmatched.txt", 'w', encoding='utf-8') as file:
-                for name in unmatched_results:
-                    file.write(name + '\n')
+            if unmatched_results:
+                with open("output_unmatched.txt", 'w', encoding='utf-8') as file:
+                    for name in unmatched_results:
+                        file.write(name + '\n')
         except IOError as e:
             raise IOError(f"Error writing output files: {e}")
 

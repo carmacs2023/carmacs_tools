@@ -1,6 +1,7 @@
 # ------------- GitHub Official .gitignore repository (Latest commit Feb-20, 2022)-----------------
 
 # Manual Exclude specific project folders
+dat_tools.env
 
 # -------------- Template starts here -------------------------------------------------------------
 

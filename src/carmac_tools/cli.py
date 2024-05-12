@@ -1,5 +1,6 @@
 import argparse
 from .file_tools import list_files_from_dir, unzip, copy_matched_files, match_names_to_filenames
+from .dat_tools import calculate_checksum_dir
 import argcomplete
 
 
@@ -70,6 +71,14 @@ def main():
                              help='Enforce that filenames end with a specific extension.')
     copy_parser.add_argument('--extension', type=str, help='File extension to check for if enforce_extension is true.')
 
+    # Subparser for the calculate_checksum_dir command
+    checksum_parser = subparsers.add_parser('calculate_checksum', help='Calculate and verify checksums for ROM files based on a DAT file.')
+    checksum_parser.add_argument('--source_dir', type=str, required=True, help='The directory containing the ROM files to verify.')
+    checksum_parser.add_argument('--dat_filename', type=str, required=True,
+                                 help='The filename of the DAT XML file containing metadata and checksums.')
+    checksum_parser.add_argument('--checksum_type', type=str, choices=['crc', 'md5', 'sha1'],
+                                 default='sha1', help='Type of checksum to compute.')
+
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
 
@@ -89,6 +98,9 @@ def main():
         copy_matched_files(
             filename_matched_list=args.filename_matched_list, source=args.source, destination=args.destination,
             enforce_extension=args.enforce_extension, extension=args.extension if args.enforce_extension else None)
+
+    elif args.command == 'calculate_checksum':
+        calculate_checksum_dir(source_dir=args.source_dir, dat_filename=args.dat_filename, checksum_type=args.checksum_type)
 
 
 if __name__ == '__main__':
